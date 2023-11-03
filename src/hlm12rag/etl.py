@@ -1,7 +1,10 @@
+# Python Built-in Modules
 import pathlib
-import kaggle
-import zipfile
 import shutil
+import zipfile
+
+# Third-Party Libraries
+import kaggle
 
 DIR_TMP = pathlib.Path("/tmp/kaggle")
 
