@@ -1,7 +1,0 @@
-python-dotenv>=1.0.0
-kaggle>=1.5.16
-huggingface-hub>=0.18.0
-langchain[docarray]>=0.0.329
-pydantic==1.10.13 #required by `docarray`
-sentence-transformers>=2.2.2
-unstructured>=0.10.28
