@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+
+[project]
+dependencies = [
+    "huggingface-hub>=0.18.0",
+    "langchainhub>=0.1.13",
+    "langchain[docarray]>=0.0.329",
+    "pydantic==1.10.13",            #required by `docarray`
+    "sentence-transformers>=2.2.2",
+    "unstructured>=0.10.28",
+
+]
+name = "hlm12rag"
+version = "0.0.1"
+authors = [{ name = "Hudson Mendes", email = "hudsonmendes@gmail.com" }]
+description = "Retrieval Augmented Generation (RAG) for Question Answering"
+readme = "README.md"
+license = { file = "LICENSE" }
+urls = { homepage = "https://github.com/hudsonmendes/hlm12rag" }
+keywords = ["llm", "rag", "question-answering"]
+
+[project.optional-dependencies]
+dev = ["pre-commit>=3.3.3", "black[jupyter]>=23.7.0", "isort>=5.12.0"]
+test = ["pytest>=7.4.0", "hypothesis>=6.84.2"]
+etl = ["kaggle>=1.5.16"]
+modelling = ["python-dotenv>=1.0.0"]
+training = []
+serving = []
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"
+line_length = 120
+src_paths = ["dev", "src", "tests"]
+known_third_party = ["langchain"]
+known_first_party = [""]
+import_heading_stdlib = "Python Built-in Modules"
+import_heading_thirdparty = "Third-Party Libraries"
+import_heading_firstparty = "My Packages and Modules"
+import_heading_localfolder = "Local Folders"

@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "attach",
+            "justMyCode": false,
+        }
+    ]
+}
