@@ -5,8 +5,8 @@ requires = ["setuptools", "wheel"]
 dependencies = [
     "huggingface-hub>=0.18.0",
     "langchainhub>=0.1.13",
-    "langchain[docarray]>=0.0.329",
-    "pydantic==1.10.13",            #required by `docarray`
+    "langchain[redis]>=0.0.329",
+    "redis>=5.0.1",
     "sentence-transformers>=2.2.2",
     "unstructured>=0.10.28",
 

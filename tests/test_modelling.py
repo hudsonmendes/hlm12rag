@@ -9,9 +9,9 @@ from hlm12rag.modelling import RagQABuilder
 class TestRagQA(unittest.TestCase):
     def setUp(self) -> None:
         self.pairs_generic = {
-            "Which one is in the UK? Berlin or London?": "London",
-            "Where is Brazil located? South America or North America?": "South America",
-            "What's the largest ocean in the world?": "Pacific Ocean",
+            "What is the currency in England": None,
+            "Where is Brazil located? South America or North America?": None,
+            "What's the largest ocean in the world?": None,
         }
         self.pairs_specific = {
             "What's arguslweruna role?": "king",
@@ -22,7 +22,7 @@ class TestRagQA(unittest.TestCase):
         document_dir = pathlib.Path("./data_sample")
         self.qa = RagQABuilder(dirpath=document_dir).build()
 
-    def test_ask_answers_from_knowledge(self):
+    def test_ask_does_not_answers_from_knowledge(self):
         for question, expected in self.pairs_generic.items():
             actual = self.qa.ask(question)
             print((question, expected, actual))

@@ -160,5 +160,6 @@ cython_debug/
 #.idea/
 
 # Data
-sample/
 data/
+!data/docs_sample/
+!data/splits/
