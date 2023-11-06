@@ -161,5 +161,5 @@ cython_debug/
 
 # Data
 data/
-!data/docs_sample/
-!data/splits/
+!data/docs_sample/*.txt
+!data/splits/*.csv
