@@ -4,10 +4,10 @@ from dataclasses import dataclass, field
 
 # Third-Party Libraries
 from langchain.chains import RetrievalQA
-from langchain.prompts import ChatPromptTemplate
 from langchain.document_loaders import DirectoryLoader
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.llms.huggingface_pipeline import HuggingFacePipeline
+from langchain.prompts import ChatPromptTemplate
 from langchain.schema.vectorstore import VectorStoreRetriever
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores.redis import Redis
