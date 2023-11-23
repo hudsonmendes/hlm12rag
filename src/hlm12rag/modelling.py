@@ -1,5 +1,6 @@
 # Python Built-in Modules
 import pathlib
+from typing import Literal
 from dataclasses import dataclass, field
 
 # Third-Party Libraries
@@ -10,7 +11,9 @@ from langchain.llms.huggingface_pipeline import HuggingFacePipeline
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema.vectorstore import VectorStoreRetriever
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.vectorstores import VectorStore
 from langchain.vectorstores.redis import Redis
+from langchain.vectorstores.docarray import DocArrayInMemorySearch
 
 QA_PROMPT = """
 You are an assistant for question-answering tasks.
@@ -72,20 +75,22 @@ class RagQABuilder:
     A builder for RagQA instances.
 
     :attr dirpath: The directory containing the documents to be used for retrieval.
+    :attr retrieval_store: The vector store used as the retrieval mechanism
     :attr retrieval_chunk_size: The size of the chunks to split the documents into for retrieval, defaults to 64
     :attr retrieval_chunk_overlap: The amount of overlap between chunks, defaults to 32
     :attr retrieval_embedding_model_id: The model to use for document embedding, defaults to `multi-qa-MiniLM-L6-cos-v1`
-    :attr retrieval_search_threshold: The threshold to use for document retrieval, defaults to 0.4
+    :attr retrieval_search_threshold: The threshold to use for document retrieval, defaults to 0.4. Zero or None deactivate thresholds.
     :attr pipeline_task: The task to use for response generation, defaults to `text2text-generation`
     :attr pipeline_model_id: The model to use for response generation, defaults to `google/flan-t5-small`
     :attr pipeline_model_kwargs: The kwargs to pass to the model for response generation, defaults to dict(temperature=10e-16, max_length=64, do_sample=True)
     """
 
     dirpath: pathlib.Path
+    retrieval_store: Literal["redis", "ram"] = field(default="redis")
     retrieval_chunk_size: int = field(default=128)
     retrieval_chunk_overlap: int = field(default=32)
     retrieval_embedding_model_id: str = field(default="multi-qa-MiniLM-L6-cos-v1")
-    retrieval_search_threshold: float = field(default=0.4)
+    retrieval_search_threshold: float | None = field(default=0.4)
     pipeline_task: str = field(default="text2text-generation")
     pipeline_model_id: str = field(default="google/flan-t5-small")
     pipeline_model_kwargs: dict = field(
@@ -110,15 +115,30 @@ class RagQABuilder:
         )
         document_loader = DirectoryLoader(self.dirpath)
         documents = document_loader.load()
-        document_chunker = RecursiveCharacterTextSplitter(
+        document_chunker = self._build_document_chunker()
+        document_chunks = document_chunker.split_documents(documents)
+        embeddings = HuggingFaceEmbeddings(model_name=self.retrieval_embedding_model_id)
+        vector_store = self._build_vector_store(document_chunks, embeddings)
+        vector_retriever = self._build_vector_retriever(vector_store)
+        return RagQA(llm=llm, retriever=vector_retriever)
+
+    def _build_document_chunker(self):
+        return RecursiveCharacterTextSplitter(
             chunk_size=self.retrieval_chunk_size,
             chunk_overlap=self.retrieval_chunk_overlap,
         )
-        document_chunks = document_chunker.split_documents(documents)
-        embeddings = HuggingFaceEmbeddings(model_name=self.retrieval_embedding_model_id)
-        vector_store = Redis.from_documents(document_chunks, embeddings)
-        vector_retriever = vector_store.as_retriever(
-            search_type="similarity_score_threshold",
-            search_kwargs=dict(score_threshold=self.retrieval_search_threshold),
-        )
-        return RagQA(llm=llm, retriever=vector_retriever)
+
+    def _build_vector_store(self, document_chunks, embeddings):
+        if self.retrieval_store == "redis":
+            return Redis.from_documents(document_chunks, embeddings)
+        return DocArrayInMemorySearch.from_documents(document_chunks, embeddings)
+
+    def _build_vector_retriever(self, vector_store):
+        if not self.retrieval_search_threshold and self.retrieval_store == "ram":
+            raise ValueError("`ram` does not support self.retrieval_search_threshold due to a bug in LangChain.")
+        if self.retrieval_search_threshold:
+            return vector_store.as_retriever(
+                search_type="similarity_score_threshold",
+                search_kwargs=dict(score_threshold=self.retrieval_search_threshold),
+            )
+        return vector_store.as_retriever()

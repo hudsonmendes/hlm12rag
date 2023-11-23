@@ -19,8 +19,12 @@ class TestRagQA(unittest.TestCase):
             "What is 4831asx capable of?": "shooting lasers",
         }
 
-        document_dir = pathlib.Path("./data_sample")
-        self.qa = RagQABuilder(dirpath=document_dir).build()
+        document_dir = pathlib.Path("./data/docs_sample")
+        self.qa = RagQABuilder(
+            dirpath=document_dir,
+            retrieval_store="ram",
+            retrieval_search_threshold=None,
+        ).build()
 
     def test_ask_does_not_answers_from_knowledge(self):
         for question, expected in self.pairs_generic.items():
