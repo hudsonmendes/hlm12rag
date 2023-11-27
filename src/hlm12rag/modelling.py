@@ -1,7 +1,7 @@
 # Python Built-in Modules
 import pathlib
-from typing import Literal
 from dataclasses import dataclass, field
+from typing import Literal
 
 # Third-Party Libraries
 from langchain.chains import RetrievalQA
@@ -12,8 +12,8 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.schema.vectorstore import VectorStoreRetriever
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import VectorStore
-from langchain.vectorstores.redis import Redis
 from langchain.vectorstores.docarray import DocArrayInMemorySearch
+from langchain.vectorstores.redis import Redis
 
 QA_PROMPT = """
 You are an assistant for question-answering tasks.
@@ -128,7 +128,7 @@ class RagQABuilder:
             chunk_overlap=self.retrieval_chunk_overlap,
         )
 
-    def _build_vector_store(self, document_chunks, embeddings):
+    def _build_vector_store(self, document_chunks, embeddings) -> VectorStore:
         if self.retrieval_store == "redis":
             return Redis.from_documents(document_chunks, embeddings)
         return DocArrayInMemorySearch.from_documents(document_chunks, embeddings)
