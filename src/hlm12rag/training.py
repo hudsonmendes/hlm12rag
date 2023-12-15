@@ -26,7 +26,7 @@ class QATraining:
     results: List[QATrainingResult] = field(default_factory=list)
 
     @property
-    def score(self) -> float:
+    def acc_score(self) -> float:
         return sum([r.score for r in self.results]) / len(self.results)
 
 
